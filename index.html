@@ -74,13 +74,31 @@ const db = firebase.database();
 
 // 👉 TOI = user1
 function setStatus(s){
-  db.ref('status/user1').set(s);
+  db.ref('status/user1').set({
+    text: s,
+    time: Date.now()
+  });
 }
 
-// 👉 Affiche l’état de l’autre (user2)
 db.ref('status/user2').on('value', snap=>{
-  document.getElementById('other').innerText = snap.val() || "—";
+  const data = snap.val();
+  if(!data){
+    document.getElementById('other').innerText = "—";
+    return;
+  }
+
+  const date = new Date(data.time);
+  const formatted =
+    date.toLocaleDateString() + " " +
+    date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+  document.getElementById('other').innerHTML =
+    `<div>${data.text}</div>
+     <div style="font-size:12px;color:#666;margin-top:8px;">
+       mis à jour : ${formatted}
+     </div>`;
 });
+
 </script>
 
 </body>
