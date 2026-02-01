@@ -1,1 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Météo</title>
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  text-align: center;
+  margin-top: 60px;
+}
+#other {
+  font-size: 48px;
+  margin-bottom: 50px;
+}
+button {
+  font-size: 28px;
+  padding: 22px;
+  margin: 12px;
+  width: 85%;
+  border-radius: 18px;
+  border: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="other">…</div>
+
+<button onclick="setStatus('🟢 OK')">🟢 OK</button>
+<button onclick="setStatus('🟡 Fatigué')">🟡 Fatigué</button>
+<button onclick="setStatus('🔴 Stressé')">🔴 Stressé</button>
+<button onclick="setStatus('⚫ Ne pas déranger')">⚫ Ne pas déranger</button>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDoKJZJiIVGux81dxvfhUscqe9c0baElQ4",
+  authDomain: "meteo-des-humeurs.firebaseapp.com",
+  databaseURL: "https://meteo-des-humeurs-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "meteo-des-humeurs"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// 👉 TOI = user1
+function setStatus(s){
+  db.ref('status/user1').set(s);
+}
+
+// 👉 Affiche l’état de l’autre (user2)
+db.ref('status/user2').on('value', snap=>{
+  document.getElementById('other').innerText = snap.val() || "—";
+});
+</script>
+
+</body>
+</html>
 
