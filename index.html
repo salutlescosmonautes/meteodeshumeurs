@@ -103,6 +103,14 @@ body {
   pointer-events:none; white-space:nowrap; z-index:100;
 }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.close-btn {
+  background:none; border:none; cursor:pointer;
+  font-size:13px; color:var(--text2); font-weight:400;
+  padding:4px 10px; border-radius:100px;
+  border:1px solid var(--border);
+  transition:all 0.2s ease;
+}
+.close-btn:active { opacity:0.6; }
 </style>
 </head>
 <body>
@@ -110,6 +118,7 @@ body {
   <div class="header">
     <span class="header-title">Météo des humeurs</span>
     <span class="time-indicator" id="clock"></span>
+    <button class="close-btn" onclick="closeApp()">fermer ×</button>
   </div>
 
   <div class="other-card">
@@ -169,6 +178,12 @@ const choices = [
 
 let myCurrentStatus = null;
 
+function closeApp() {
+  window.close();
+  // fallback si window.close() bloque (PWA)
+  history.back();
+}
+
 function updateTheme() {
   const h = new Date().getHours();
   document.body.classList.toggle('dark', h >= 20 || h < 7);
@@ -209,6 +224,7 @@ function setMyStatus(status) {
   highlightActive(status);
   db.ref('status/' + MY_USER).set({ text: status, time: Date.now() });
   showToast('Statut mis \u00e0 jour \u2713');
+  setTimeout(() => window.close(), 1200);
 }
 
 function getDescForStatus(text) {
