@@ -256,13 +256,25 @@ function refreshNudgePanel() {
 
     // Requêtes en retard (passées sans réponse)
     const pastSlots = (schedData?.slots || []).filter(t => t <= now && t > lastUpdate);
-    const nudgeUnanswered = nudgeSentAt > 0 && nudgeSentAt > lastUpdate;
+
+    // Nudge : 3 états possibles
+    // - nudgeActive = true : envoyé, pas encore reçu par le widget
+    // - nudgeActive = false + nudgeSentAt > lastUpdate : notifié, pas encore répondu
+    // - nudgeActive = false + lastUpdate > nudgeSentAt : répondu
+    const nudgeSent = nudgeSentAt > 0;
+    const nudgeNotified = nudgeSent && !nudgeActive && nudgeSentAt > lastUpdate;
+    const nudgePending = nudgeSent && nudgeActive && nudgeSentAt > lastUpdate;
+    const nudgeUnanswered = nudgeSent && nudgeSentAt > lastUpdate; // pending ou notifié
 
     // Regrouper toutes les requêtes non répondues
     let unanswered = [];
-    if (nudgeUnanswered) unanswered.push({ type: 'nudge', time: nudgeSentAt });
-    pastSlots.forEach(t => unanswered.push({ type: 'auto', time: t }));
-    unanswered.sort((a, b) => b.time - a.time); // plus récente en premier
+    if (nudgeUnanswered) unanswered.push({ 
+      type: 'nudge', 
+      time: nudgeSentAt,
+      label: nudgePending ? 'envoyé, en attente' : 'notifié, en attente de réponse'
+    });
+    pastSlots.forEach(t => unanswered.push({ type: 'auto', time: t, label: 'en attente' }));
+    unanswered.sort((a, b) => b.time - a.time);
 
     // Dernière requête répondue (toujours affichée si elle existe)
     const allPast = [...(schedData?.slots || []).filter(t => t <= now)];
@@ -275,10 +287,9 @@ function refreshNudgePanel() {
     }
 
     if (unanswered.length > 0) {
-      // Requêtes en attente
       unanswered.forEach(r => {
         const ic = r.type === 'nudge' ? '🚩' : '⏰';
-        lines.push(ic + ' ' + fmtTime(r.time) + ' — en attente');
+        lines.push(ic + ' ' + fmtTime(r.time) + ' — ' + r.label);
       });
     }
 
