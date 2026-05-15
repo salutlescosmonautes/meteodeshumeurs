@@ -76,7 +76,7 @@ html, body {
 .nudge-btn:active { transform: scale(0.98); }
 .nudge-left { display: flex; align-items: center; gap: 7px; }
 .nudge-text { font-size: 11px; color: var(--nudge); font-weight: 500; }
-.nudge-schedule { font-size: 9px; color: var(--text2); text-align: right; line-height: 1.4; }
+.nudge-schedule { font-size: 9px; color: var(--text2); text-align: right; line-height: 1.6; }
 .toast {
   position: fixed; bottom: 20px; left: 50%;
   transform: translateX(-50%) translateY(60px);
@@ -215,46 +215,89 @@ db.ref('status/' + MY_USER).once('value', snap => {
   if (d) { myCurrentStatus = d.text; highlightActive(d.text); }
 });
 
-db.ref('meta/' + OTHER_USER + '/schedule').once('value', snap => {
-  const d = snap.val();
-  if (!d || !d.slots) return;
-  const next = d.slots.find(t => t > Date.now());
-  const el = document.getElementById('nudge-schedule');
-  if (next) {
-    const nd = new Date(next);
-    el.textContent = 'rappel auto ~' + String(nd.getHours()).padStart(2,'0') + 'h' + String(nd.getMinutes()).padStart(2,'0');
-  } else {
-    el.textContent = 'rappel demain';
-  }
-});
+// Nudge schedule handled by refreshNudgePanel()
 
 function sendNudge() {
+  const now = Date.now();
   db.ref('meta/' + OTHER_USER + '/n').set(true);
-  localStorage.setItem('nudgeSentAt', Date.now());
-  updateNudgeStatus('sent');
+  db.ref('meta/' + OTHER_USER + '/nudge_sent_at').set(now);
   showToast('🚩 Demande envoyée');
+  setTimeout(refreshNudgePanel, 500);
 }
 
-function updateNudgeStatus(state) {
+function fmtTime(ts) {
+  const d = new Date(ts);
+  return String(d.getHours()).padStart(2,'0') + 'h' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function fmtDateTime(ts) {
+  const d = new Date(ts);
+  const day = d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
+  return day + ' ' + fmtTime(ts);
+}
+
+function refreshNudgePanel() {
   const el = document.getElementById('nudge-schedule');
-  if (state === 'sent') {
-    el.textContent = 'demande envoyée…';
-  } else if (state === 'received') {
-    el.textContent = 'reçu ✓';
-  }
-}
 
-function checkNudgeState() {
-  const sentAt = localStorage.getItem('nudgeSentAt');
-  if (!sentAt) return;
-  db.ref('meta/' + OTHER_USER + '/n').once('value', snap => {
-    const raw = snap.val();
-    if (raw === false || raw === null) {
-      updateNudgeStatus('received');
-      localStorage.removeItem('nudgeSentAt');
+  Promise.all([
+    db.ref('meta/' + OTHER_USER + '/schedule').once('value'),
+    db.ref('meta/' + OTHER_USER + '/nudge_sent_at').once('value'),
+    db.ref('meta/' + OTHER_USER + '/n').once('value'),
+    db.ref('status/' + OTHER_USER).once('value')
+  ]).then(([schedSnap, nudgeSentSnap, nudgeActiveSnap, statusSnap]) => {
+    const now = Date.now();
+    const schedData = schedSnap.val();
+    const nudgeSentAt = nudgeSentSnap.val() || 0;
+    const nudgeActive = nudgeActiveSnap.val();
+    const lastUpdate = statusSnap.val()?.time || 0;
+    const slots = (schedData?.slots || []).filter(t => t > now);
+
+    let lines = [];
+
+    // Requêtes en retard (passées sans réponse)
+    const pastSlots = (schedData?.slots || []).filter(t => t <= now && t > lastUpdate);
+    const nudgeUnanswered = nudgeSentAt > 0 && nudgeSentAt > lastUpdate;
+
+    // Regrouper toutes les requêtes non répondues
+    let unanswered = [];
+    if (nudgeUnanswered) unanswered.push({ type: 'nudge', time: nudgeSentAt });
+    pastSlots.forEach(t => unanswered.push({ type: 'auto', time: t }));
+    unanswered.sort((a, b) => b.time - a.time); // plus récente en premier
+
+    if (unanswered.length > 0) {
+      // La plus récente
+      const latest = unanswered[0];
+      const icon = latest.type === 'nudge' ? '🚩' : '⏰';
+      lines.push(icon + ' ' + fmtTime(latest.time) + ' — en attente');
+      // Les autres en retard
+      unanswered.slice(1).forEach(r => {
+        const ic = r.type === 'nudge' ? '🚩' : '⏰';
+        lines.push(ic + ' ' + fmtTime(r.time) + ' — en attente');
+      });
     } else {
-      updateNudgeStatus('sent');
+      // Dernière requête répondue
+      const allPast = [...(schedData?.slots || []).filter(t => t <= now)];
+      if (nudgeSentAt > 0) allPast.push(nudgeSentAt);
+      allPast.sort((a, b) => b - a);
+      if (allPast.length > 0 && lastUpdate > 0) {
+        const latest = allPast[0];
+        const icon = latest === nudgeSentAt ? '🚩' : '⏰';
+        if (lastUpdate > latest) {
+          lines.push(icon + ' ' + fmtTime(latest) + ' — répondu à ' + fmtTime(lastUpdate) + ' ✓');
+        }
+      }
     }
+
+    // Prochains rappels
+    slots.forEach(t => {
+      lines.push('→ rappel auto ~' + fmtTime(t));
+    });
+
+    if (lines.length === 0) {
+      lines.push('rappel demain');
+    }
+
+    el.innerHTML = lines.join('<br>');
   });
 }
 
@@ -267,9 +310,9 @@ function showToast(msg) {
 
 updateTheme();
 renderButtons();
-checkNudgeState();
+refreshNudgePanel();
 setInterval(updateTheme, 60000);
-setInterval(checkNudgeState, 30000);
+setInterval(refreshNudgePanel, 30000);
 </script>
 </body>
 </html>
