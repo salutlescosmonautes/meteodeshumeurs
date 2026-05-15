@@ -264,28 +264,22 @@ function refreshNudgePanel() {
     pastSlots.forEach(t => unanswered.push({ type: 'auto', time: t }));
     unanswered.sort((a, b) => b.time - a.time); // plus récente en premier
 
+    // Dernière requête répondue (toujours affichée si elle existe)
+    const allPast = [...(schedData?.slots || []).filter(t => t <= now)];
+    if (nudgeSentAt > 0) allPast.push(nudgeSentAt);
+    allPast.sort((a, b) => b - a);
+    const lastAnswered = allPast.find(t => t < lastUpdate);
+    if (lastAnswered && lastUpdate > 0) {
+      const icon = lastAnswered === nudgeSentAt ? '🚩' : '⏰';
+      lines.push('✓ ' + icon + ' ' + fmtTime(lastAnswered) + ' — répondu à ' + fmtTime(lastUpdate));
+    }
+
     if (unanswered.length > 0) {
-      // La plus récente
-      const latest = unanswered[0];
-      const icon = latest.type === 'nudge' ? '🚩' : '⏰';
-      lines.push(icon + ' ' + fmtTime(latest.time) + ' — en attente');
-      // Les autres en retard
-      unanswered.slice(1).forEach(r => {
+      // Requêtes en attente
+      unanswered.forEach(r => {
         const ic = r.type === 'nudge' ? '🚩' : '⏰';
         lines.push(ic + ' ' + fmtTime(r.time) + ' — en attente');
       });
-    } else {
-      // Dernière requête répondue
-      const allPast = [...(schedData?.slots || []).filter(t => t <= now)];
-      if (nudgeSentAt > 0) allPast.push(nudgeSentAt);
-      allPast.sort((a, b) => b - a);
-      if (allPast.length > 0 && lastUpdate > 0) {
-        const latest = allPast[0];
-        const icon = latest === nudgeSentAt ? '🚩' : '⏰';
-        if (lastUpdate > latest) {
-          lines.push(icon + ' ' + fmtTime(latest) + ' — répondu à ' + fmtTime(lastUpdate) + ' ✓');
-        }
-      }
     }
 
     // Prochains rappels
