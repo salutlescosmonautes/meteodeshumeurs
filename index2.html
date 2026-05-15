@@ -230,7 +230,32 @@ db.ref('meta/' + OTHER_USER + '/schedule').once('value', snap => {
 
 function sendNudge() {
   db.ref('meta/' + OTHER_USER + '/n').set(true);
+  localStorage.setItem('nudgeSentAt', Date.now());
+  updateNudgeStatus('sent');
   showToast('🚩 Demande envoyée');
+}
+
+function updateNudgeStatus(state) {
+  const el = document.getElementById('nudge-schedule');
+  if (state === 'sent') {
+    el.textContent = 'demande envoyée…';
+  } else if (state === 'received') {
+    el.textContent = 'reçu ✓';
+  }
+}
+
+function checkNudgeState() {
+  const sentAt = localStorage.getItem('nudgeSentAt');
+  if (!sentAt) return;
+  db.ref('meta/' + OTHER_USER + '/n').once('value', snap => {
+    const raw = snap.val();
+    if (raw === false || raw === null) {
+      updateNudgeStatus('received');
+      localStorage.removeItem('nudgeSentAt');
+    } else {
+      updateNudgeStatus('sent');
+    }
+  });
 }
 
 function showToast(msg) {
@@ -242,7 +267,9 @@ function showToast(msg) {
 
 updateTheme();
 renderButtons();
+checkNudgeState();
 setInterval(updateTheme, 60000);
+setInterval(checkNudgeState, 30000);
 </script>
 </body>
 </html>

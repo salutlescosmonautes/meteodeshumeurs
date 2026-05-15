@@ -128,7 +128,7 @@ const choices = [
   { emoji: "🔥", label: "Heat wave", desc: "consentement à l'imprévu sexuel et kinky engagé (ex: lieux engageants, invité·e·s) sans perte de contrôle" },
   { emoji: "❤️‍🔥", label: "Control kink", desc: "consentement à l'imprévu sexuel kinky sans perte de contrôle" },
   { emoji: "❤️", label: "Sweet body", desc: "consentement à l'imprévu sexuel vanille" },
-  { emoji: "💘", label: "Sweet heart", desc: "consentement à l'imprévu non-sexuel" },
+  { emoji: "🩷", label: "Sweet heart", desc: "consentement à l'imprévu non-sexuel" },
   { emoji: "🤍", label: "Own Peace", desc: "besoin de respirer / me reposer / dormir, ne pas me déranger" },
   { emoji: "🏳", label: "White romance", desc: "épuisé·e mais besoin de toi" },
   { emoji: "🏴", label: "Dark romance", desc: "je ne vais pas bien et j'ai besoin de toi" },
@@ -230,7 +230,32 @@ db.ref('meta/' + OTHER_USER + '/schedule').once('value', snap => {
 
 function sendNudge() {
   db.ref('meta/' + OTHER_USER + '/n').set(true);
+  localStorage.setItem('nudgeSentAt', Date.now());
+  updateNudgeStatus('sent');
   showToast('🚩 Demande envoyée');
+}
+
+function updateNudgeStatus(state) {
+  const el = document.getElementById('nudge-schedule');
+  if (state === 'sent') {
+    el.textContent = 'demande envoyée…';
+  } else if (state === 'received') {
+    el.textContent = 'reçu ✓';
+  }
+}
+
+function checkNudgeState() {
+  const sentAt = localStorage.getItem('nudgeSentAt');
+  if (!sentAt) return;
+  db.ref('meta/' + OTHER_USER + '/n').once('value', snap => {
+    const raw = snap.val();
+    if (raw === false || raw === null) {
+      updateNudgeStatus('received');
+      localStorage.removeItem('nudgeSentAt');
+    } else {
+      updateNudgeStatus('sent');
+    }
+  });
 }
 
 function showToast(msg) {
@@ -242,7 +267,9 @@ function showToast(msg) {
 
 updateTheme();
 renderButtons();
+checkNudgeState();
 setInterval(updateTheme, 60000);
+setInterval(checkNudgeState, 30000);
 </script>
 </body>
 </html>
