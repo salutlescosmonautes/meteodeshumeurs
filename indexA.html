@@ -37,10 +37,11 @@ html, body {
   gap: 5px;
 }
 .other-card {
-  background: var(--card); border: 1px solid var(--border);
+  background: var(--card); border: 1px solid var(--text2);
   border-radius: 13px; padding: 9px 11px;
   display: flex; align-items: center; gap: 10px;
-  box-shadow: 0 2px 8px var(--shadow); flex-shrink: 0;
+  box-shadow: 0 3px 12px var(--shadow); flex-shrink: 0;
+  opacity: 0.92;
 }
 .other-emoji { font-size: 30px; line-height: 1; flex-shrink: 0; }
 .other-text { flex: 1; min-width: 0; }
@@ -72,11 +73,19 @@ html, body {
   cursor: pointer; transition: all 0.15s ease;
   flex-shrink: 0; width: 100%;
 }
+.nudge-btn.waiting {
+  background: rgba(100,100,100,0.07);
+  border-color: rgba(100,100,100,0.15);
+  opacity: 0.7;
+  cursor: default;
+}
+.nudge-btn.waiting .nudge-text { color: var(--text2); }
 .dark .nudge-btn { border-color: rgba(232,168,124,0.12); }
 .nudge-btn:active { transform: scale(0.98); }
+.nudge-btn.waiting:active { transform: none; }
 .nudge-left { display: flex; align-items: center; gap: 7px; }
 .nudge-text { font-size: 11px; color: var(--nudge); font-weight: 500; }
-.nudge-schedule { font-size: 9px; color: var(--text2); text-align: right; line-height: 1.6; }
+.nudge-schedule { font-size: 9px; color: var(--text2); text-align: right; line-height: 1.6; min-width: 100px; }
 .toast {
   position: fixed; bottom: 20px; left: 50%;
   transform: translateX(-50%) translateY(60px);
@@ -150,6 +159,8 @@ function renderButtons() {
   list.innerHTML = '';
   choices.forEach(c => {
     const full = c.emoji + ' ' + c.label;
+    const row = document.createElement('div');
+    row.className = 'btn-row';
     const btn = document.createElement('button');
     btn.className = 'status-btn';
     btn.dataset.value = full;
@@ -158,15 +169,25 @@ function renderButtons() {
       '<div class="btn-text">' +
         '<span class="btn-label">' + c.label + '</span>' +
         '<span class="btn-desc">' + c.desc + '</span>' +
-      '</div>' +
-      '<span class="btn-vous">vous</span>';
+      '</div>';
     btn.onclick = () => setMyStatus(full);
-    list.appendChild(btn);
+    const vous = document.createElement('span');
+    vous.className = 'btn-vous-label';
+    vous.id = 'vous-' + c.label.replace(/[^a-z]/gi, '');
+    vous.textContent = '← vous';
+    row.appendChild(btn);
+    row.appendChild(vous);
+    list.appendChild(row);
   });
 }
 
 function highlightActive(s) {
-  document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b.dataset.value === s));
+  document.querySelectorAll('.status-btn').forEach(b => {
+    const isActive = b.dataset.value === s;
+    b.classList.toggle('active', isActive);
+    const label = b.closest('.btn-row')?.querySelector('.btn-vous-label');
+    if (label) label.style.display = isActive ? 'block' : 'none';
+  });
 }
 
 function setMyStatus(s) {
@@ -304,6 +325,16 @@ function refreshNudgePanel() {
     }
 
     el.innerHTML = lines.join('<br>');
+
+    // Toggle waiting state on nudge button
+    const nudgeBtn = document.querySelector('.nudge-btn');
+    const hasWaiting = unanswered.length > 0;
+    nudgeBtn.classList.toggle('waiting', hasWaiting);
+    if (hasWaiting) {
+      nudgeBtn.onclick = null;
+    } else {
+      nudgeBtn.onclick = sendNudge;
+    }
   });
 }
 
