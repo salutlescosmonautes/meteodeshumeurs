@@ -16,6 +16,7 @@
   --nudge:#8b3a3a;--nudge-bg:rgba(139,58,58,0.07);
   --done:#4a7a4a;--done-bg:rgba(74,122,74,0.06);
   --sep:rgba(0,0,0,0.1);
+  --col1:40px;--col-sep:1px;--col2:90px;
 }
 .dark{
   --bg:#0f0e0c;--card:rgba(28,26,22,0.9);--text:#f0ebe0;--text2:#7a7268;
@@ -27,51 +28,77 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);transition:background 0.5s ease;}
-.app{display:flex;flex-direction:column;height:100%;padding:env(safe-area-inset-top,10px) 10px env(safe-area-inset-bottom,10px) 10px;gap:4px;}
+.app{display:flex;flex-direction:column;height:100%;padding:env(safe-area-inset-top,12px) 10px env(safe-area-inset-bottom,12px) 10px;gap:4px;}
 
 /* Header */
-.other-card{background:var(--card);border:1.5px solid var(--text2);border-radius:13px;padding:8px 0 8px 0;display:flex;align-items:stretch;box-shadow:0 3px 12px var(--shadow);flex-shrink:0;}
-.col-emoji{width:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-.other-emoji{font-size:28px;line-height:1;}
-.col-info{display:flex;flex-direction:column;justify-content:center;gap:2px;padding:0 8px 0 0;flex-shrink:0;}
-.other-label{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text2);font-weight:500;}
-.other-name{font-family:'Instrument Serif',serif;font-size:14px;font-style:italic;color:var(--text);line-height:1.2;}
-.other-time{font-size:8px;color:var(--text2);opacity:0.7;}
-.col-sep{width:1px;background:var(--sep);margin:4px 0;flex-shrink:0;}
-.col-desc{flex:1;display:flex;align-items:center;padding:0 10px;}
-.other-desc{font-size:9px;color:var(--text2);font-weight:300;line-height:1.4;}
+.other-card{
+  background:var(--card);border:1.5px solid var(--text2);border-radius:14px;
+  display:flex;align-items:stretch;box-shadow:0 3px 12px var(--shadow);
+  flex-shrink:0;margin-bottom:4px;
+  min-height:72px;
+}
+.col-emoji{width:var(--col1);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.other-emoji{font-size:34px;line-height:1;}
+.col-info{width:var(--col2);flex-shrink:0;display:flex;flex-direction:column;justify-content:center;gap:3px;padding:10px 8px 10px 0;}
+.other-label{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text2);font-weight:500;}
+.other-name{font-family:'Instrument Serif',serif;font-size:16px;font-style:italic;color:var(--text);line-height:1.2;}
+.other-time{font-size:9px;color:var(--text2);opacity:0.8;}
+.col-sep{width:var(--col-sep);background:var(--sep);margin:8px 0;flex-shrink:0;}
+.col-desc{flex:1;display:flex;align-items:center;padding:10px 12px;}
+.other-desc{font-size:10px;color:var(--text2);font-weight:300;line-height:1.5;}
 
-/* Boutons — même layout 3 colonnes que header */
+/* Boutons — colonnes alignées avec header */
 .buttons-list{display:flex;flex-direction:column;gap:3px;flex:1;overflow:hidden;}
 .btn-row{display:flex;align-items:stretch;width:100%;gap:4px;}
-.status-btn{background:var(--card);border:1px solid var(--border);border-radius:10px;display:flex;align-items:stretch;cursor:pointer;transition:all 0.2s ease;box-shadow:0 1px 3px var(--shadow);flex:1;text-align:left;overflow:hidden;padding:0;}
-.status-btn:active{transform:scale(0.98);opacity:0.85;}
+.status-btn{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  display:flex;align-items:stretch;cursor:pointer;
+  transition:background 0.2s ease,border-color 0.2s ease;
+  box-shadow:0 1px 3px var(--shadow);flex:1;overflow:hidden;padding:0;
+}
+.status-btn:active{opacity:0.8;}
 .status-btn.active{background:var(--active);border-color:var(--active);flex:0 0 calc(100% - 36px);}
 .status-btn.active .btn-label{color:var(--active-text);}
 .status-btn.active .btn-desc{color:var(--active-text);opacity:0.6;}
 .status-btn.active .btn-sep{background:rgba(255,255,255,0.15);}
-.btn-ecol{width:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-.btn-emoji{font-size:18px;line-height:1;}
-.btn-icol{display:flex;align-items:center;padding:6px 8px 6px 0;flex-shrink:0;}
-.btn-label{font-size:11px;font-weight:500;color:var(--text);display:block;line-height:1.2;}
-.btn-sep{width:1px;background:var(--sep);margin:4px 0;flex-shrink:0;}
-.btn-dcol{flex:1;display:flex;align-items:center;padding:6px 8px;}
-.btn-desc{font-size:8.5px;color:var(--text2);font-weight:300;line-height:1.3;}
+/* Col 1 emoji — même largeur que header */
+.btn-ecol{width:var(--col1);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.btn-emoji{font-size:20px;line-height:1;}
+/* Col 2 label — même largeur que header */
+.btn-icol{width:var(--col2);flex-shrink:0;display:flex;align-items:center;padding:0 8px 0 0;}
+.btn-label{font-size:11px;font-weight:500;color:var(--text);line-height:1.2;}
+/* Séparateur — même position que header */
+.btn-sep{width:var(--col-sep);background:var(--sep);margin:5px 0;flex-shrink:0;}
+/* Col 3 description */
+.btn-dcol{flex:1;display:flex;align-items:center;padding:0 10px;}
+.btn-desc{font-size:9px;color:var(--text2);font-weight:300;line-height:1.3;}
 .btn-vous{font-size:8px;color:var(--text2);font-weight:500;width:32px;text-align:center;flex-shrink:0;display:none;align-self:center;}
 
-/* Footer nudge */
-.nudge-row{display:flex;align-items:stretch;gap:4px;flex-shrink:0;}
-.nudge-main{background:var(--nudge-bg);border:1px solid rgba(139,58,58,0.15);border-radius:10px;padding:6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s ease;width:33%;flex-shrink:0;gap:2px;}
+/* Footer nudge — hauteur fixe = 4 pastilles */
+.nudge-row{display:flex;align-items:stretch;gap:4px;flex-shrink:0;margin-top:4px;}
+.nudge-main{
+  background:var(--nudge-bg);border:1px solid rgba(139,58,58,0.15);border-radius:10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:all 0.15s ease;width:33%;flex-shrink:0;gap:3px;
+}
 .nudge-main.waiting{background:rgba(100,100,100,0.07);border-color:rgba(100,100,100,0.15);opacity:0.5;cursor:default;}
 .nudge-main:active{transform:scale(0.97);}
 .nudge-main.waiting:active{transform:none;}
 .dark .nudge-main{border-color:rgba(232,168,124,0.15);}
-.nudge-flag{font-size:15px;line-height:1;}
-.nudge-main-text{font-size:8.5px;color:var(--nudge);font-weight:500;text-align:center;line-height:1.2;}
+.nudge-flag{font-size:16px;line-height:1;}
+.nudge-main-text{font-size:9px;color:var(--nudge);font-weight:500;text-align:center;line-height:1.2;}
 .nudge-main.waiting .nudge-main-text{color:var(--text2);}
 .nudge-pills{display:flex;flex-direction:column;gap:3px;flex:1;}
-.pill{border-radius:7px;padding:0 7px;font-size:8px;border:1px solid var(--border);background:var(--card);color:var(--text2);display:flex;align-items:center;gap:5px;flex:1;white-space:nowrap;overflow:hidden;}
-.pill-icon{flex-shrink:0;font-size:10px;}
+/* Chaque pastille = flex:1 sauf none qui peut grandir */
+.pill{
+  border-radius:7px;padding:0 8px;font-size:8.5px;
+  border:1px solid var(--border);background:var(--card);
+  color:var(--text2);display:flex;align-items:center;gap:5px;
+  flex:1;white-space:nowrap;overflow:hidden;min-height:0;
+}
+.pill.grow2{flex:2;}
+.pill.grow3{flex:3;}
+.pill-icon{flex-shrink:0;}
 .pill-main{font-weight:500;color:var(--text);flex-shrink:0;}
 .pill-sub{opacity:0.75;flex:1;overflow:hidden;text-overflow:ellipsis;}
 .pill.done{border-color:rgba(74,122,74,0.3);background:var(--done-bg);}
@@ -81,7 +108,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .pill.pending{border-color:rgba(139,58,58,0.2);background:var(--nudge-bg);}
 .pill.pending .pill-main{color:var(--nudge);}
 .pill.future{opacity:0.6;}
-.pill.none{justify-content:center;opacity:0.4;font-style:italic;}
+.pill.none{justify-content:center;opacity:0.4;font-style:italic;font-size:8px;}
 
 /* Toast */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--text);color:var(--bg);padding:7px 16px;border-radius:100px;font-size:12px;font-weight:500;opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;z-index:100;}
@@ -101,7 +128,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
     <div class="col-desc"><div class="other-desc" id="other-desc"></div></div>
   </div>
   <div class="buttons-list" id="buttons-list"></div>
-  <div class="nudge-row">
+  <div class="nudge-row" id="nudge-row">
     <button class="nudge-main" id="nudge-main-btn" onclick="sendNudge()">
       <span class="nudge-flag">🚩</span>
       <span class="nudge-main-text">demander une mise à jour</span>
@@ -145,25 +172,31 @@ function fmtTime(ts){
 function fmtDayPrefix(ts){
   const d=new Date(ts);
   const now=new Date();
-  const dDay=new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime();
-  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
-  if(dDay===today) return '';
-  if(dDay===today-86400000) return 'hier ';
+  const dMidnight=new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime();
+  const todayMidnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  if(dMidnight===todayMidnight) return '';
+  if(dMidnight===todayMidnight-86400000) return 'hier ';
   const months=['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
   return 'le '+d.getDate()+' '+months[d.getMonth()]+' ';
 }
 
 function fmtFull(ts){
   const p=fmtDayPrefix(ts);
-  return p?p+fmtTime(ts):fmtTime(ts);
+  return (p||'')+fmtTime(ts);
 }
 
-function fmtRelative(ts){
-  const diff=Math.floor((Date.now()-ts)/60000);
-  if(diff<5) return "à l'instant";
-  const p=fmtDayPrefix(ts);
-  if(!p) return "aujourd'hui à "+fmtTime(ts);
-  return p+'à '+fmtTime(ts);
+function fmtElapsed(ts){
+  const diffMs=Date.now()-ts;
+  if(diffMs<0) return fmtFull(ts);
+  const diffMin=Math.floor(diffMs/60000);
+  if(diffMin<1) return "à l'instant";
+  if(diffMin<60) return 'il y a '+diffMin+'min';
+  const diffH=Math.floor(diffMin/60);
+  const remMin=diffMin%60;
+  if(diffH<24) return 'il y a '+(remMin>0?diffH+'h'+String(remMin).padStart(2,'0'):diffH+'h');
+  const diffD=Math.floor(diffH/24);
+  const remH=diffH%24;
+  return 'il y a '+(remH>0?diffD+'j'+remH+'h':diffD+'j');
 }
 
 function renderButtons(){
@@ -211,6 +244,12 @@ function setMyStatus(s){
 
 function getDesc(t){const f=choices.find(c=>t.startsWith(c.emoji));return f?f.desc:'';}
 
+// Mise à jour temps relatif toutes les minutes
+let otherUpdateTs=0;
+function updateOtherTime(){
+  if(otherUpdateTs>0) document.getElementById('other-time').textContent='màj '+fmtElapsed(otherUpdateTs);
+}
+
 db.ref('status/'+OTHER_USER).on('value',snap=>{
   const d=snap.val();
   if(!d){
@@ -218,13 +257,15 @@ db.ref('status/'+OTHER_USER).on('value',snap=>{
     document.getElementById('other-name').textContent='pas encore de statut';
     document.getElementById('other-desc').textContent='';
     document.getElementById('other-time').textContent='';
+    otherUpdateTs=0;
     return;
   }
   const p=d.text.split(' ');
   document.getElementById('other-emoji').textContent=p[0];
   document.getElementById('other-name').textContent=p.slice(1).join(' ');
   document.getElementById('other-desc').textContent=getDesc(d.text);
-  document.getElementById('other-time').textContent='màj '+fmtRelative(d.time);
+  otherUpdateTs=d.time;
+  updateOtherTime();
 });
 
 db.ref('status/'+MY_USER).once('value',snap=>{
@@ -232,9 +273,9 @@ db.ref('status/'+MY_USER).once('value',snap=>{
   if(d){myCurrentStatus=d.text;highlightActive(d.text);}
 });
 
-function makePill(icon,main,sub,cls){
+function makePill(icon,main,sub,cls,grow){
   const p=document.createElement('div');
-  p.className='pill '+cls;
+  p.className='pill '+cls+(grow?' grow'+grow:'');
   p.innerHTML=(icon?'<span class="pill-icon">'+icon+'</span>':'')+
     '<span class="pill-main">'+main+'</span>'+
     (sub?'<span class="pill-sub">'+sub+'</span>':'');
@@ -261,66 +302,61 @@ function refreshNudgePanel(){
     const futureSlots=((sched?.slots)||[]).filter(t=>t>now).sort((a,b)=>a-b);
     const pastSlots=((sched?.slots)||[]).filter(t=>t<=now).sort((a,b)=>b-a);
 
-    // Etats nudge
     const nudgeSent=nudgeSentAt>0;
     const nudgePending=nudgeSent&&nudgeActive&&nudgeSentAt>lastUpdate;
     const nudgeNotified=nudgeSent&&!nudgeActive&&nudgeNotifiedAt>0&&nudgeSentAt>lastUpdate;
     const nudgeUnanswered=nudgePending||nudgeNotified;
 
-    // Une seule réponse efface TOUTES les demandes antérieures
-    // Toutes les requêtes passées (slots + nudge) antérieures à lastUpdate = répondues
+    // Une réponse (lastUpdate) efface toutes les demandes antérieures
     const unansweredSlots=pastSlots.filter(t=>t>lastUpdate);
     const hasWaiting=nudgeUnanswered||unansweredSlots.length>0;
 
-    // Dernière requête répondue (la plus récente avant lastUpdate)
+    // Dernière requête répondue
     const allPast=[...pastSlots];
     if(nudgeSent) allPast.push(nudgeSentAt);
     allPast.sort((a,b)=>b-a);
     const lastAnsweredTs=lastUpdate>0?allPast.find(t=>t<=lastUpdate):null;
     const lastAnsweredIsNudge=lastAnsweredTs&&nudgeSent&&lastAnsweredTs===nudgeSentAt;
 
+    // Construire liste de pastilles (hors "none")
     let pills=[];
 
-    // Pastille 1 : toujours la dernière répondue
+    // 1. Toujours : dernière répondue
     if(lastAnsweredTs){
-      pills.push(makePill(
-        lastAnsweredIsNudge?'🚩':'⏰',
-        fmtFull(lastAnsweredTs),
-        '✔️ '+fmtTime(lastUpdate),
-        'done'
-      ));
-    } else {
-      pills.push(makePill('','aucune réponse encore','','none'));
+      pills.push({icon:lastAnsweredIsNudge?'🚩':'⏰',main:fmtFull(lastAnsweredTs),sub:'✔️ '+fmtTime(lastUpdate),cls:'done'});
     }
 
-    // Pastille 2 : alerte la plus urgente en attente
+    // 2. Nudge en attente
     if(nudgeUnanswered){
-      const sub=nudgePending?'⏳ envoyé':'🛎️ notifié à '+fmtTime(nudgeNotifiedAt);
-      pills.push(makePill('🚩',fmtFull(nudgeSentAt),sub,'notified'));
-    } else if(unansweredSlots.length>0){
-      pills.push(makePill('⏰',fmtFull(unansweredSlots[0]),'🛎️ en attente','pending'));
-    } else if(futureSlots.length>0){
-      pills.push(makePill('⏰',fmtFull(futureSlots[0]),'⏳ programmé','future'));
-    } else {
-      pills.push(makePill('','pas d\'alerte avant demain','','none'));
+      const sub=nudgePending?'⏳ envoyé':'🛎️ notifié '+fmtTime(nudgeNotifiedAt);
+      pills.push({icon:'🚩',main:fmtFull(nudgeSentAt),sub:sub,cls:'notified'});
     }
 
-    // Pastille 3 : alerte suivante
-    const nextFuture=nudgeUnanswered||unansweredSlots.length>0?futureSlots[0]:futureSlots[1];
-    if(nextFuture){
-      pills.push(makePill('⏰',fmtFull(nextFuture),'⏳ programmé','future'));
-    } else if(pills.length<3){
-      pills.push(makePill('','pas d\'autre alerte avant demain','','none'));
-    }
+    // 3. Slots passés sans réponse
+    unansweredSlots.forEach(t=>{
+      pills.push({icon:'⏰',main:fmtFull(t),sub:'🛎️ en attente',cls:'pending'});
+    });
 
-    // Pastille 4 : encore suivante si dispo
-    const nextFuture2=nudgeUnanswered||unansweredSlots.length>0?futureSlots[1]:futureSlots[2];
-    if(nextFuture2){
-      pills.push(makePill('⏰',fmtFull(nextFuture2),'⏳ programmé','future'));
-    }
+    // 4. Slots futurs
+    futureSlots.forEach(t=>{
+      pills.push({icon:'⏰',main:fmtFull(t),sub:'⏳ programmé',cls:'future'});
+    });
+
+    // Calculer combien de "none" pour compléter jusqu'à 4
+    const realCount=Math.min(pills.length,4);
+    const noneCount=4-realCount;
 
     pillsEl.innerHTML='';
-    pills.slice(0,4).forEach(p=>pillsEl.appendChild(p));
+
+    // Afficher max 4 vraies pastilles
+    pills.slice(0,4).forEach(p=>{
+      pillsEl.appendChild(makePill(p.icon,p.main,p.sub,p.cls,0));
+    });
+
+    // Ajouter UNE pastille "none" qui prend le reste de la hauteur
+    if(noneCount>0){
+      pillsEl.appendChild(makePill('','pas d\'autre alerte avant demain','','none',noneCount));
+    }
 
     mainBtn.classList.toggle('waiting',hasWaiting);
     mainBtn.onclick=hasWaiting?null:sendNudge;
@@ -342,11 +378,29 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),1800);
 }
 
+// Taille footer = 4 lignes de pastilles
+function setFooterHeight(){
+  const app=document.querySelector('.app');
+  const header=document.querySelector('.other-card');
+  const list=document.querySelector('.buttons-list');
+  const footer=document.querySelector('.nudge-row');
+  const appH=app.clientHeight;
+  const gaps=4*4; // 4 gaps de 4px
+  const headerH=header.offsetHeight;
+  // footer = 4 * hauteur d'une pastille (~22px) + 3 gaps internes
+  const footerH=4*22+3*3;
+  footer.style.height=footerH+'px';
+  footer.style.flexShrink='0';
+}
+
 updateTheme();
 renderButtons();
 refreshNudgePanel();
+setFooterHeight();
 setInterval(updateTheme,60000);
 setInterval(refreshNudgePanel,30000);
+setInterval(updateOtherTime,60000);
+window.addEventListener('resize',setFooterHeight);
 </script>
 </body>
 </html>
