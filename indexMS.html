@@ -203,7 +203,8 @@ function fmtElapsed(ts){
 function fmtElapsedShort(ts){return fmtFull(ts);}
 
 function updateOtherTime(){
-  if(otherUpdateTs>0) document.getElementById('other-time').textContent=fmtElapsed(otherUpdateTs);
+  const ts=sanitizeTs(otherUpdateTs);
+  document.getElementById('other-time').textContent=fmtElapsed(ts);
 }
 
 function getDesc(t){const f=choices.find(c=>t.startsWith(c.emoji));return f?f.desc:'';}
@@ -303,7 +304,7 @@ db.ref('status/'+OTHER_USER).on('value',snap=>{
   document.getElementById('other-emoji').textContent=p[0];
   document.getElementById('other-name').textContent=p.slice(1).join(' ');
   document.getElementById('other-desc').textContent=getDesc(d.text);
-  otherUpdateTs=d.time;
+  otherUpdateTs=d.time||0;
   updateOtherTime();
 });
 
