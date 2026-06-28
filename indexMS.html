@@ -163,35 +163,44 @@ let otherUpdateTs=0;
 
 function updateTheme(){document.body.classList.toggle('dark',new Date().getHours()>=20||new Date().getHours()<7);}
 
-function fmtElapsed(ts){
-  const ms=Date.now()-ts;
-  if(ms<0) return 'à venir';
-  const m=Math.floor(ms/60000);
-  if(m<1) return "à l'instant";
-  if(m<60) return 'il y a '+m+'min';
-  const h=Math.floor(m/60),rm=m%60;
-  if(h<24) return 'il y a '+(rm>0?h+'h'+String(rm).padStart(2,'0'):h+'h');
-  const d=Math.floor(h/24),rh=h%24;
-  return 'il y a '+(rh>0?d+'j'+rh+'h':d+'j');
+// Timestamp valide = > 1er jan 2020
+function isValidTs(ts){return ts>1577836800000;}
+
+// Sanitize timestamp : si 0 ou invalide, retourne Date.now()
+function sanitizeTs(ts){return isValidTs(ts)?ts:Date.now();}
+
+function fmtTime(ts){
+  const d=new Date(ts);
+  return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
 }
 
-function fmtElapsedShort(ts){
-  const ms=Date.now()-ts;
-  if(ms<0){
-    // futur — afficher durée avant
-    const m=Math.floor(-ms/60000);
-    if(m<60) return 'dans '+m+'min';
-    const h=Math.floor(m/60),rm=m%60;
-    return 'dans '+(rm>0?h+'h'+String(rm).padStart(2,'0'):h+'h');
-  }
-  const m=Math.floor(ms/60000);
-  if(m<1) return "à l'instant";
-  if(m<60) return 'il y a '+m+'min';
-  const h=Math.floor(m/60),rm=m%60;
-  if(h<24) return 'il y a '+(rm>0?h+'h'+String(rm).padStart(2,'0'):h+'h');
-  const d=Math.floor(h/24),rh=h%24;
-  return 'il y a '+(rh>0?d+'j'+rh+'h':d+'j');
+function fmtDayLabel(ts){
+  const d=new Date(ts),now=new Date();
+  const dm=new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime();
+  const tm=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  const diff=Math.round((dm-tm)/86400000);
+  if(diff===0) return "aujourd'hui";
+  if(diff===-1) return 'hier';
+  if(diff===-2) return 'avant-hier';
+  if(diff===1) return 'demain';
+  if(diff<0) return 'il y a '+Math.abs(diff)+' jours';
+  return 'dans '+diff+' jours';
 }
+
+function fmtFull(ts){
+  ts=sanitizeTs(ts);
+  const day=fmtDayLabel(ts);
+  return day+' '+fmtTime(ts);
+}
+
+// Pour le header : "aujourd'hui à 14:32" ou "hier à 14:32"
+function fmtElapsed(ts){
+  ts=sanitizeTs(ts);
+  return fmtDayLabel(ts)+' à '+fmtTime(ts);
+}
+
+// Alias pour pastilles
+function fmtElapsedShort(ts){return fmtFull(ts);}
 
 function updateOtherTime(){
   if(otherUpdateTs>0) document.getElementById('other-time').textContent=fmtElapsed(otherUpdateTs);
