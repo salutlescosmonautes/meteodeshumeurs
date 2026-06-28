@@ -340,27 +340,34 @@ function refreshNudgePanel(){
   ]).then(([schedSnap,sentSnap,notifSnap,activeSnap,statusSnap])=>{
     const now=Date.now();
     const sched=schedSnap.val();
-    const nudgeSentAt=Number(sentSnap.val()||0);
-    const nudgeNotifiedAt=Number(notifSnap.val()||0);
+    // Timestamps valides uniquement (> 2020)
+    const nudgeSentAtRaw=Number(sentSnap.val()||0);
+    const nudgeSentAt=isValidTs(nudgeSentAtRaw)?nudgeSentAtRaw:0;
+    const nudgeNotifiedAtRaw=Number(notifSnap.val()||0);
+    const nudgeNotifiedAt=isValidTs(nudgeNotifiedAtRaw)?nudgeNotifiedAtRaw:0;
     const nudgeActive=activeSnap.val()===true||activeSnap.val()==='true';
-    const lastUpdate=Number(statusSnap.val()?.time||0);
+    // Si time=0 (vient du Raccourci), on utilise Date.now() comme approximation
+    const lastUpdateRaw=Number(statusSnap.val()?.time||0);
+    const lastUpdate=isValidTs(lastUpdateRaw)?lastUpdateRaw:Date.now();
 
-    const future=((sched?.slots)||[]).filter(t=>t>now).sort((a,b)=>a-b);
-    const past=((sched?.slots)||[]).filter(t=>t<=now).sort((a,b)=>b-a);
+    const future=((sched?.slots)||[]).filter(t=>isValidTs(t)&&t>now).sort((a,b)=>a-b);
+    const past=((sched?.slots)||[]).filter(t=>isValidTs(t)&&t<=now).sort((a,b)=>b-a);
 
     const nudgeSent=nudgeSentAt>0;
     const nudgePending=nudgeSent&&nudgeActive&&nudgeSentAt>lastUpdate;
     const nudgeNotified=nudgeSent&&!nudgeActive&&nudgeNotifiedAt>0&&nudgeSentAt>lastUpdate;
     const nudgeUnanswered=nudgePending||nudgeNotified;
+    // Une réponse (lastUpdate) efface toutes les demandes antérieures
     const unanswered=past.filter(t=>t>lastUpdate);
     const hasWaiting=nudgeUnanswered||unanswered.length>0;
 
-    // Dernière requête répondue parmi tous les événements
+    // Dernière requête répondue : la plus récente parmi tous les événements <= lastUpdate
     const allEvents=[...past];
     if(nudgeSent) allEvents.push(nudgeSentAt);
     allEvents.sort((a,b)=>b-a);
-    const lastAnsweredTs=lastUpdate>0?allEvents.find(t=>t<=lastUpdate):null;
-    const lastAnsweredIsNudge=nudgeSent&&lastAnsweredTs!=null&&Math.abs(lastAnsweredTs-nudgeSentAt)<5000;
+    const lastAnsweredTs=allEvents.find(t=>t<=lastUpdate)||null;
+    // C'est un nudge si nudgeSentAt existe et correspond exactement
+    const lastAnsweredIsNudge=nudgeSent&&lastAnsweredTs===nudgeSentAt;
 
     // Pastilles réelles (max 4 — la 1 est toujours l'historique)
     let pills=[];
