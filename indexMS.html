@@ -306,6 +306,7 @@ db.ref('status/'+OTHER_USER).on('value',snap=>{
   document.getElementById('other-desc').textContent=getDesc(d.text);
   otherUpdateTs=d.time||0;
   updateOtherTime();
+  refreshNudgePanel();
 });
 
 // Mon statut — on() pour détecter changements PWA et Raccourci
