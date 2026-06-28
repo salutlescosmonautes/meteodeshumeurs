@@ -312,7 +312,11 @@ db.ref('status/'+OTHER_USER).on('value',snap=>{
 // Mon statut — on() pour détecter changements PWA et Raccourci
 db.ref('status/'+MY_USER).on('value',snap=>{
   const d=snap.val();
-  if(d){myCurrentStatus=d.text;highlightActive(d.text);}
+  if(d){
+    myCurrentStatus=d.text;
+    highlightActive(d.text);
+    refreshNudgePanel();
+  }
 });
 
 function makePill(icon,main,sub,cls,grow){
